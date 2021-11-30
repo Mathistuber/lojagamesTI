@@ -1,76 +1,99 @@
 <?php
+session_start();
 include_once("header.php");
 include_once("../models/conexao.php");
 include_once("../models/bancoPedidos.php");
-include_once("../models/bancoFuncionario.php");
 include_once("../models/bancoCliente.php");
+include_once("../models/bancoFuncionario.php");
 include_once("../models/bancoJogos.php");
-$codUsuFK = $_SESSION["codUsu"];
-$funcionario = listabuscafunUsu($conexao,$codUsuFK);
+
+$CodUsuFK =  $_SESSION["codUsu"];
+$funcionario =listabuscaFunUsu($conexao,$CodUsuFK);
 ?>
 
-<div class="row g-3">
-
-  <div class="col-md-2">
-    <label for="inputcodFun" class="form-label">Codigo</label>
-    <input type="text" readonly value="<?php echo($funcionario["codFun"])?>" class="form-control" id="inputcodFun" placeholder="1234">
-
-     <button type="submit" class="btn btn-dark">Buscar</button>
- </div>
-  <div class="col-5">
-    <label for="inputnomeFun" class="form-label">Funcionario</label>
-    <input type="text" readonly value="<?=$funcionario['nomeFun']?>" class="form-control" id="inputNomeFun">
-  </div>
+    <div class="row g-3">
+    <div class="col-md-3">
+      <label for="inputFun" class="form-label">Código</label>
+        <input type="text" readonly value="<?php echo($funcionario["codFun"])?>" class="form-control" id="inputFun">
+    </div>
+  <div class="col-md-8">
+     <label for="inputNomeFun" class="form-label">Funcionario</label>
+        <input type="text" readonly value="<?php echo($funcionario["nomeFun"])?>"class="form-control" id="inputNomeFun">
+    </div>
+    <!--COD CLIENTE -->
+    <!--COD CLIENTE -->
   <?php
-   $codCli= isset($_POST["codCli"])?$_POST["codCli"]:"0";
+  $codCliente = isset($_POST["codCliente"])?$_POST["codCliente"]:0;
+  $clientes = isset($codCliente)?listaTudoClienteCod($conexao, $codCliente):"";
+  $_SESSION["codigoCliente"] = isset($clientes["codCli"])?$clientes["codCli"]:"0";
+  $_SESSION["nomeCliente"] = isset($clientes["nomeCli"])?$clientes["nomeCli"]:"";
+
   ?>
-  <div class="col-md-2">
-    <label for="inputCodCli" class="form-label">Codigo</label>
-    <form method="post" action="cadastroPedido.php">
-    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-    <input type="text" value="<?=$codCli?>" name="codCli" class="form-control" id="inputcodCli" required>
-    <button class="btn btn-dark me-md-2 " type="submit">Pesquisar</button>
-  </div>
-  </form>
-  </div>
-  <?php
- 
-$clientes = isset($codCli)?listaTudoClienteCod($conexao,$codCli):"";
-$_SESSION["codigoCliente"] = isset($_POST["codCli"])?$_POST["codCli"]:0;
+    <div class="col-4">
+      <label for="inputcodCli" class="form-label">Código</label>
+       <form method="post" action="cadastroPedido.php">
+          <div class="d-grid gap-3 d-md-flex justify-content-md-end">
+            <input type="text" value="<?=$_SESSION["codigoCliente"]?>" name="codCliente" class="form-control" id="inputcodCli" placeholder="1234">
+            <button type="submit" require class="btn btn-dark"> Buscar </button>
+          </div>
 
+        </form>
 
-   ?>
-  <div class="col-5">
-    <label for="inputCodCli" class="form-label">Cliente</label>
-    <input type="text" name="nomeCli" required class="form-control" id="inputCodCli" >
-  </div>
-  <div class="col-md-4">
-    <label for="inputnomeJog" class="form-label">Jogo</label>
-    <input type="text" name="nomeJog" class="form-control" id="inputcodJog">
-  </div>
-  <div class="col-md-5">
-    <label for="inputState" class="form-label">Quantidade</label>
-    <select id="inputState" class="form-select">
-      <option selected>Escolha...</option>
-      <option value=1>1</option>
-      <option value=2>2</option>
-      <option value=3>3</option>
-      <option value=4>4</option>
-    </select>
-  </div>
-  <div class="col-md-3">
-    <label for="inputvalorJog" class="form-label">Valor Unitario</label>
-    <input type="text" name="precoJog" class="form-control" id="inputvalorJog">
-  </div>
-  <div class="col-md-2">
-    <label for="inputtotalped" class="form-label">Total</label>
-    <input type="text" name="totalped" class="form-control" id="inputtotalped">
-  </div>
-  <div class="col-12">
-    <button type="submit" class="btn btn-outline-dark">Finalizar</button>
-  </div>
-</div>
+    </div>
 
+    <div class="col-7">
+      <label for="inputNomeCli" class="form-label">Cliente</label>
+       <input type="text" readonly value="<?=$_SESSION['nomeCliente']?>" class="form-control" id="inputNomeCli" placeholder="Vinicius">
+    </div>
+      <!--COD JOGO -->
+      <!--COD JOGO -->
+      <?php
+        $codJogo = isset($_POST["codJogo"])?$_POST["codJogo"]:0;
+      ?>
+    <div class="col-4">
+      <label for="inputcodCli" class="form-label">Código</label>
+       <form method="post" action="cadastroPedido.php">
+          <div class="d-grid gap-3 d-md-flex justify-content-md-end">
+            <input type="text" value="<?=$codJogo?>" name="codJogo" class="form-control" id="inputcodJog">
+            <input type="hidden" value="<?=$_SESSION["codigoCliente"]?>" name="codCliente">
+            <input type="hidden" value="<?=$_SESSION["nomeCliente"]?>" name="nomeCliente">
+            
+            <button type="submit" class="btn btn-dark"> Buscar </button>
+          </div>
+
+        </form>
+
+    </div>
+
+    <?php
+        $jogos = isset($codJogo)?listaTudoJogosCod($conexao, $codJogo):"";
+        $_SESSION["codigoJogo"] = isset($jogos["codJogo"])?$jogos["codJogo"]:"0";
+        $_SESSION["nomeJogo"] = isset($jogos["nomeJog"])?$jogos["nomeJog"]:"";
+        $_SESSION["precoJogo"] = isset($jogos["precoJog"])?$jogos["precoJog"]:"";
+    ?>
+
+    <div class="col-7">
+      <label for="inputNomeJog" class="form-label">Funcionario</label>
+       <input type="text" readonly value="<?=$_SESSION['nomeJogo']?>" class="form-control" id="inputNomeJog" placeholder="Matheus">
+       </div>
+    <div class="col-md-11">
+     <label for="inputvalorunitario" class="form-label">Valor Unitario</label>
+       <input type="text" readonly value="<?=$_SESSION['precoJogo']?>" class="form-control" id="inputvalorunitario">
+    </div>
+
+    <form method="post" action="../controllers/inserirPedidos.php">
+          <div class="d-grid gap-3 d-md-flex justify-content-md-end">
+            <input type="hidden" value="<?=$codJogo?>" name="codJogFK">
+            <input type="hidden" value="<?=$_SESSION["codigoCliente"]?>" name="codCliFK">
+            <input type="hidden" value=" <?php echo($funcionario["codFun"])?>" name="codFunFK">
+            <input type="hidden" value="<?=$_SESSION["precoJogo"]?>" name="valorUnit">
+            
+            <div class="col-12">
+ <button type="submit" class="btn btn-dark">Confirmar</button>
+    </div>
+
+        </form>
+
+    </div>
 <?php
-include("../views/footer.php");
-?>
+    include("../views/footer.php");
